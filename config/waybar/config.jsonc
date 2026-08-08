@@ -24,7 +24,7 @@
 
   "group/controls": {
     "orientation": "horizontal",
-    "modules": ["backlight", "pulseaudio", "network", "battery"]
+    "modules": ["backlight", "pulseaudio", "network", "bluetooth", "battery"]
   },
 
   "group/session": {
@@ -134,6 +134,19 @@
     "tooltip-format-ethernet": "{ifname}\n{ipaddr}",
     "tooltip-format-disconnected": "Disconnected",
     "on-click": "nm-connection-editor"
+  },
+
+  "bluetooth": {
+    "format": "󰂯",
+    "format-disabled": "󰂲",
+    "format-off": "󰂲",
+    "format-on": "󰂯",
+    "format-connected": "󰂱",
+    "tooltip-format": "{controller_alias}",
+    "tooltip-format-off": "Bluetooth off",
+    "tooltip-format-connected": "{controller_alias}\n{num_connections} connected\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "on-click": "blueman-manager"
   },
 
   "battery": {

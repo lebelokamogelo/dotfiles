@@ -90,6 +90,24 @@ local floatApps = {
 }
 for _, m in ipairs(floatApps) do hl.window_rule({ match = m, float = true }) end
 
+-- Chromium/Brave extension popups (Bitwarden, uBlock, any toolbar dropdown) are not
+-- real popups: each opens as its own toplevel window with class
+-- brave-<extension-id>-Default and title _crx_<extension-id>. The id is always 32
+-- chars from a-p. Nothing else in this file matches that shape, so they were landing
+-- in the tiling layout and shoving the browser aside instead of appearing as a
+-- dropdown. Floating them restores the popup behaviour and lets them keep the size
+-- the extension asked for. Capped like the modals below so a misbehaving one cannot
+-- exceed the usable area.
+-- Browser extension popups (Bitwarden etc). Chromium destroys them on focus loss,
+-- so pin focus. Class is brave-<32-char extension id>-Default.
+hl.window_rule({
+    match        = { class = "^(brave|brave-browser|chromium|google-chrome)-[a-p]{32}-Default$" },
+    float        = true,
+    center       = true,
+    stay_focused = true,
+    max_size     = { "monitor_w*0.85", "monitor_h*0.85" },
+})
+
 -- Float Common Modals
 local modalMatches = {
     { title = "^(Open|Authentication Required|Add Folder to Workspace|Choose Files|Save As|Confirm to replace files|File Operation Progress)$" },

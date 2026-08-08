@@ -7,6 +7,8 @@ hl.config({
             splash = CACHYLGREEN,
         },
         middle_click_paste = false,
+        -- let dialogs that request focus have it
+        focus_on_activate = true,
         enable_swallow = true,
         swallow_regex = "(kitty|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)",
         vrr = 3,

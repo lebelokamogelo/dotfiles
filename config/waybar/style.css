@@ -56,6 +56,7 @@ window#waybar.hidden {
 #backlight,
 #pulseaudio,
 #network,
+#bluetooth,
 #battery {
   padding: 0 8px;
   transition: color 150ms ease;
@@ -144,6 +145,7 @@ window#waybar.empty #window {
 #memory:hover,
 #pulseaudio:hover,
 #network:hover,
+#bluetooth:hover,
 #backlight:hover,
 #clock:hover {
   color: @accent;
@@ -181,6 +183,15 @@ window#waybar.empty #window {
 #network.disconnected,
 #network.linked {
   color: @crit;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+  color: @muted;
+}
+
+#bluetooth.connected {
+  color: @accent2;
 }
 
 #custom-notification {
