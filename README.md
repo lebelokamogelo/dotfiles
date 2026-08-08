@@ -28,20 +28,25 @@ preview, `--no-pkgs` to deploy configs without touching pacman.
 | `config/btop/`, `gtk-*`, `qt6ct/`, `nwg-look/` | `~/.config/` | Theming + monitoring |
 | `systemd/user/` | `~/.config/systemd/user/` | Restart drop-ins for waybar + hyprpaper |
 | `local/bin/setbg` | `~/.local/bin/setbg` | Wallpaper switcher |
+| `sddm/navy/` | `/usr/share/sddm/themes/` | Login screen theme (needs root) |
 | `packages.txt` | — | Package list installed by `install.sh` |
 
-## Two things worth knowing
+## Notes
 
-**waybar and hyprpaper run under systemd, not Hyprland's autostart.** They are
-deliberately *not* in `config/hypr/config/autostart.lua`. Waybar's mpris module
-can segfault (a `libplayerctl` signal reaching a dead `Glib::Dispatcher`), and
-when it was launched fire-and-forget from Hyprland, nothing brought it back —
-the bar would silently vanish mid-session. The drop-ins in `systemd/user/` set
-`Restart=always` with `StartLimitIntervalSec=0`, so it recovers in ~1s instead.
+**waybar and hyprpaper run under systemd, not Hyprland's autostart.** Waybar's
+mpris module can segfault, and launched fire-and-forget nothing restarted it.
+The drop-ins in `systemd/user/` set `Restart=always`.
 
-**The wallpaper lives in two configs.** `hyprpaper.conf` sets the desktop and
-`hyprlock.conf` sets the lock screen — they are separate. Changing one leaves
-the other stale, or pointing at a deleted file. `setbg` writes both.
+**The wallpaper lives in two configs** — `hyprpaper.conf` (desktop) and
+`hyprlock.conf` (lock screen). `setbg` writes both.
+
+**SDDM theme** in `sddm/navy/`, installed to `/usr/share/sddm/themes/` with a
+`/etc/sddm.conf.d/10-theme.conf` drop-in. Colours, background, blur and fonts
+are all in `theme.conf`. Preview it without installing:
+
+```bash
+sddm-greeter-qt6 --test-mode --theme ./sddm/navy
+```
 
 ## setbg
 
@@ -58,9 +63,7 @@ Applies live over hyprpaper IPC (no restart), then persists to both configs.
 Searches `~/.local/share/wallpapers`, `~/Pictures/wallpapers`, and
 `/usr/share/wallpapers`. Edit `WALLPAPER_DIRS` at the top to add more.
 
-Note: hyprpaper ≥0.8 dropped the `preload` IPC command — most guides online
-still tell you to call it first, but it now returns `invalid hyprpaper request`.
-`wallpaper` loads on demand.
+hyprpaper ≥0.8 dropped the `preload` IPC command; `wallpaper` loads on demand.
 
 ## Hardware assumptions
 

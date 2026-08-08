@@ -1,0 +1,13 @@
+[SddmGreeterTheme]
+Name=Navy
+Description=Dark navy greeter matching hyprlock
+Type=sddm-theme
+Version=1.0
+Author=kamogelo
+License=MIT
+Screenshot=preview.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=navy
+Theme-API=2.0
+QtVersion=6

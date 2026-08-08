@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
-# setbg — change the Hyprland wallpaper (hyprpaper) and lock screen (hyprlock).
-#
-# Applies the wallpaper live over hyprpaper's IPC, then writes the choice into
-# hyprpaper.conf and hyprlock.conf so it survives a restart.
-#
-#   setbg                     pick from a rofi menu with thumbnails
-#   setbg <image>             set that image
-#   setbg -r | --random       pick a random one
-#   setbg -l | --list         list every wallpaper found
-#   setbg -c | --current      show what's currently set
-#   setbg --no-lock <image>   set the desktop only, leave the lock screen alone
-#
-# Wallpapers are searched for in WALLPAPER_DIRS below.
+# Set the wallpaper for hyprpaper (desktop) and hyprlock (lock screen).
 
 set -uo pipefail
 
@@ -30,9 +18,19 @@ UPDATE_LOCK=1
 die()  { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 info() { printf '\033[36m%s\033[0m %s\n' "→" "$*"; }
 
-usage() { sed -n '2,18p' "$0" | sed 's/^# \?//'; exit 0; }
+usage() {
+    cat <<'EOF'
+setbg                    pick from a rofi menu
+setbg <image>            set that image
+setbg -r, --random       pick a random one
+setbg -l, --list         list wallpapers found
+setbg -c, --current      show current wallpaper
+setbg --no-lock <image>  desktop only, skip lock screen
+EOF
+    exit 0
+}
 
-# Every readable image under the search dirs, deduplicated, sorted by basename.
+# All images under the search dirs, deduped and sorted.
 find_wallpapers() {
     local dirs=()
     for d in "${WALLPAPER_DIRS[@]}"; do [[ -d $d ]] && dirs+=("$d"); done
@@ -42,9 +40,7 @@ find_wallpapers() {
         -o -iname '*.webp' -o -iname '*.bmp' \) 2>/dev/null | sort -u
 }
 
-# Replace the `path =` line inside a named block, preserving the original
-# indentation and alignment. hyprlock.conf has several blocks, so a blind
-# s/^path/ would hit the wrong one.
+# Replace `path =` inside a named block only. hyprlock.conf has several blocks.
 set_conf_path() {
     local file="$1" block="$2" newpath="$3" tmp
     [[ -f $file ]] || { info "skipping $file (not found)"; return 0; }
@@ -78,8 +74,7 @@ apply() {
     magick identify "$img" >/dev/null 2>&1 || die "not a readable image: $img"
     img=$(realpath "$img")
 
-    # Live apply, per connected monitor. hyprpaper >=0.8 loads on demand, so
-    # there is no preload step (older guides say otherwise; that command is gone).
+    # hyprpaper >=0.8 loads on demand, no preload step
     if command -v hyprctl >/dev/null && pgrep -x hyprpaper >/dev/null; then
         while read -r mon; do
             [[ -z $mon ]] && continue
@@ -106,7 +101,7 @@ pick_rofi() {
     list=$(find_wallpapers)
     [[ -z $list ]] && die "no wallpapers found in: ${WALLPAPER_DIRS[*]}"
 
-    # rofi renders \0icon\x1f<path> as a thumbnail, so this is a visual picker.
+    # \0icon\x1f<path> makes rofi show a thumbnail
     entry=$(while read -r f; do
                 printf '%s\0icon\x1f%s\n' "$(basename "${f%.*}")" "$f"
             done <<< "$list" |

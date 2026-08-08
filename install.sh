@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-# install.sh — restore this Hyprland setup onto a fresh CachyOS / Arch machine.
-#
-#   ./install.sh              install packages, then deploy configs
-#   ./install.sh --no-pkgs    deploy configs only, skip pacman
-#   ./install.sh --dry-run    show what would happen, change nothing
-#
-# Any config it would overwrite is moved to ~/.config-backup-<timestamp>/ first,
-# so this is safe to run on a machine that already has configs.
+# Restore this Hyprland setup on a fresh CachyOS / Arch machine.
+# Existing configs are backed up to ~/.config-backup-<timestamp>/ first.
 
 set -uo pipefail
 
@@ -35,7 +29,13 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-pkgs) INSTALL_PKGS=0; shift ;;
         --dry-run) DRY_RUN=1; shift ;;
-        -h|--help) sed -n '2,10p' "$0" | sed 's/^# \?//'; exit 0 ;;
+        -h|--help)
+            cat <<'EOF'
+./install.sh            install packages, then deploy configs
+./install.sh --no-pkgs  deploy configs only, skip pacman
+./install.sh --dry-run  show what would happen, change nothing
+EOF
+            exit 0 ;;
         *)         die "unknown option: $1" ;;
     esac
 done
@@ -101,10 +101,24 @@ done
 # waybar's own helper scripts must stay executable
 [[ -d $HOME/.config/waybar/scripts ]] && run chmod +x "$HOME"/.config/waybar/scripts/*.sh 2>/dev/null
 
+# ------------------------------------------------------------------ sddm ---
+# Needs root, so it is last: everything above still lands if sudo is declined.
+if [[ -d "$REPO/sddm" ]]; then
+    c_info "installing SDDM theme (needs sudo)"
+    if run sudo cp -r "$REPO"/sddm/. /usr/share/sddm/themes/; then
+        run sudo mkdir -p /etc/sddm.conf.d
+        # A drop-in, so an existing /etc/sddm.conf (autologin etc) is preserved.
+        if [[ $DRY_RUN -eq 0 ]]; then
+            printf '[Theme]\nCurrent=navy\n' |
+                sudo tee /etc/sddm.conf.d/10-theme.conf >/dev/null
+        fi
+        c_ok "sddm theme 'navy'"
+    else
+        c_warn "sddm theme skipped"
+    fi
+fi
+
 # ---------------------------------------------------------------- services ---
-# waybar and hyprpaper run under systemd (not hyprland's exec-once) so they
-# restart automatically if they crash. The drop-ins deployed above add
-# Restart=always; these two commands are what actually turn them on.
 c_info "enabling user services"
 if [[ $DRY_RUN -eq 0 ]] && systemctl --user show-environment &>/dev/null; then
     systemctl --user daemon-reload
