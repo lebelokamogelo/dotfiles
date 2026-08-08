@@ -194,6 +194,16 @@ window#waybar.empty #window {
   color: @accent2;
 }
 
+#custom-noctalia {
+  color: @fg;
+  padding: 0 10px;
+  transition: color 150ms ease;
+}
+
+#custom-noctalia:hover {
+  color: @accent;
+}
+
 #custom-notification {
   color: @fg;
   padding: 0 10px;

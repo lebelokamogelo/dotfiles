@@ -98,6 +98,17 @@ for src in "$REPO"/local/bin/*; do
     c_ok "$(basename "$src")"
 done
 
+# Plain cp, not deploy(): ~/.local/share/applications and icons hold entries from
+# installed packages too, so the directories must be merged, never replaced.
+c_info "deploying launcher entries and icons to ~/.local/share"
+run mkdir -p "$HOME/.local/share/applications" \
+             "$HOME/.local/share/icons/hicolor/scalable/apps"
+run cp "$REPO"/local/share/applications/*.desktop \
+       "$HOME/.local/share/applications/"
+run cp "$REPO"/local/share/icons/hicolor/scalable/apps/*.svg \
+       "$HOME/.local/share/icons/hicolor/scalable/apps/"
+c_ok "launcher entries and icons"
+
 # waybar's own helper scripts must stay executable
 [[ -d $HOME/.config/waybar/scripts ]] && run chmod +x "$HOME"/.config/waybar/scripts/*.sh 2>/dev/null
 
@@ -133,6 +144,18 @@ else
     run systemctl --user daemon-reload
     run systemctl --user enable waybar.service hyprpaper.service
 fi
+
+# Waybar draws network and bluetooth natively, so the tray applets are redundant.
+# Hidden=true in config/autostart is not enough — systemd's xdg-autostart
+# generator starts them anyway, so the generated units need masking.
+c_info "masking redundant tray applets"
+for unit in 'app-blueman@autostart.service' 'app-nm\x2dapplet@autostart.service'; do
+    if run systemctl --user mask "$unit" &>/dev/null; then
+        c_ok "$unit masked"
+    else
+        c_warn "could not mask $unit"
+    fi
+done
 
 # ------------------------------------------------------------------- notes ---
 echo

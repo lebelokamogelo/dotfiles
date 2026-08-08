@@ -29,7 +29,7 @@
 
   "group/session": {
     "orientation": "horizontal",
-    "modules": ["custom/notification", "custom/power"]
+    "modules": ["custom/noctalia", "custom/notification", "custom/power"]
   },
 
   "hyprland/workspaces": {
@@ -182,6 +182,12 @@
     "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
     "escape": true
+  },
+
+  "custom/noctalia": {
+    "format": "󰒓",
+    "tooltip-format": "Noctalia settings",
+    "on-click": "noctalia msg settings-open || (setsid noctalia --daemon >/dev/null 2>&1 & sleep 2 && noctalia msg settings-open)"
   },
 
   "custom/power": {
