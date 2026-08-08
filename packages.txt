@@ -1,0 +1,47 @@
+# Packages required by this setup. Installed by install.sh via pacman.
+# Lines starting with # and blank lines are ignored.
+
+# --- compositor + hypr ecosystem ---
+hyprland
+hyprpaper
+hyprlock
+hypridle
+hyprpolkitagent
+hyprcursor
+xdg-desktop-portal-hyprland
+uwsm
+
+# --- bar, launcher, notifications, logout ---
+waybar
+rofi
+swaync
+wlogout
+
+# --- terminals + shell ---
+kitty
+fish
+
+# --- clipboard ---
+cliphist
+wl-clipboard
+
+# --- theming ---
+papirus-icon-theme
+ttf-jetbrains-mono-nerd
+nwg-look
+qt6ct
+
+# --- media / hardware controls used by waybar modules ---
+playerctl
+brightnessctl
+pavucontrol
+network-manager-applet
+
+# --- utilities (setbg + waybar scripts depend on these) ---
+imagemagick
+jq
+btop
+micro
+
+# --- file managers ---
+nautilus

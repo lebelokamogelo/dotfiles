@@ -1,0 +1,143 @@
+configuration {
+    modes:              "drun,run,window";
+    show-icons:         true;
+    icon-theme:         "Papirus";
+    drun-display-format: "{name}";
+    display-drun:       "Apps";
+    display-run:        "Run";
+    display-window:     "Windows";
+    kb-cancel:          "Escape,super+space";
+    terminal:           "kitty";
+}
+
+* {
+    bg:        #111826;
+    bg-alt:    #182545;
+    accent:    #82dccc;
+    accent2:   #01ccff;
+    fg:        #dddddd;
+    muted:     #798bb2;
+    urgent:    #ff5555;  /* matches @crit in ~/.config/waybar/style.css */
+
+    background-color: transparent;
+    text-color:       @fg;
+    font:             "JetBrainsMono Nerd Font 12";
+}
+
+window {
+    width:            34em;
+    border-radius:    12px;
+    background-color: @bg;
+    border:           2px;
+    border-color:     @bg-alt;
+    padding:          0;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    padding:  10px;
+    spacing:  10px;
+}
+
+/* Same trap as the element rules below: rofi's built-in default theme has
+   widget-specific `entry`/`inputbar`/`case-indicator` rules, and a widget rule
+   beats the global `*` selector. Without an explicit text-color here, typed
+   text resolves to the default var(normal-foreground) -> #002b36, which is
+   invisible against @bg-alt. */
+inputbar {
+    children:         [ prompt, entry ];
+    background-color: @bg-alt;
+    text-color:       @fg;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          10px;
+}
+
+prompt {
+    text-color: @accent;
+}
+
+entry {
+    placeholder:            "Search…";
+    placeholder-color:      @muted;
+    text-color:             @fg;
+    cursor:                 text;
+}
+
+case-indicator {
+    text-color: @muted;
+}
+
+textbox {
+    text-color: @fg;
+}
+
+listview {
+    lines:        12;
+    columns:      1;
+    scrollbar:    false;
+    fixed-height: false;
+    spacing:      1px;
+}
+
+element {
+    padding:       6px 10px;
+    border-radius: 8px;
+    spacing:       10px;
+    cursor:        pointer;
+}
+
+/* Every state needs an explicit background-color. Leaving any of these out lets
+   rofi's built-in default theme fill it in with its cream palette (#fdf6e3),
+   which is what made the rows unreadable against @fg. */
+element normal normal,
+element alternate normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element normal active,
+element alternate active {
+    background-color: transparent;
+    text-color:       @accent2;
+}
+
+element normal urgent,
+element alternate urgent {
+    background-color: transparent;
+    text-color:       @urgent;
+}
+
+element selected normal,
+element selected active {
+    background-color: @accent;
+    text-color:       @bg;
+}
+
+element selected urgent {
+    background-color: @urgent;
+    text-color:       @bg;
+}
+
+element-icon {
+    size:             1.2em;
+    vertical-align:   0.5;
+    background-color: transparent;
+}
+
+element-text {
+    vertical-align:   0.5;
+    background-color: transparent;
+    text-color:       inherit;
+}
+
+message {
+    background-color: @bg-alt;
+    border-radius:    8px;
+    padding:          8px;
+}
+
+error-message {
+    padding:       10px;
+    border-radius: 8px;
+}

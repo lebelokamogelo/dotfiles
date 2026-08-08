@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+# setbg — change the Hyprland wallpaper (hyprpaper) and lock screen (hyprlock).
+#
+# Applies the wallpaper live over hyprpaper's IPC, then writes the choice into
+# hyprpaper.conf and hyprlock.conf so it survives a restart.
+#
+#   setbg                     pick from a rofi menu with thumbnails
+#   setbg <image>             set that image
+#   setbg -r | --random       pick a random one
+#   setbg -l | --list         list every wallpaper found
+#   setbg -c | --current      show what's currently set
+#   setbg --no-lock <image>   set the desktop only, leave the lock screen alone
+#
+# Wallpapers are searched for in WALLPAPER_DIRS below.
+
+set -uo pipefail
+
+HYPRPAPER_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprpaper.conf"
+HYPRLOCK_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
+
+WALLPAPER_DIRS=(
+    "$HOME/.local/share/wallpapers"
+    "$HOME/Pictures/wallpapers"
+    "$HOME/Pictures/Wallpapers"
+    "/usr/share/wallpapers"
+)
+
+UPDATE_LOCK=1
+
+die()  { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+info() { printf '\033[36m%s\033[0m %s\n' "→" "$*"; }
+
+usage() { sed -n '2,18p' "$0" | sed 's/^# \?//'; exit 0; }
+
+# Every readable image under the search dirs, deduplicated, sorted by basename.
+find_wallpapers() {
+    local dirs=()
+    for d in "${WALLPAPER_DIRS[@]}"; do [[ -d $d ]] && dirs+=("$d"); done
+    [[ ${#dirs[@]} -eq 0 ]] && return 0
+    find "${dirs[@]}" -type f \
+        \( -iname '*.png' -o -iname '*.jpg'  -o -iname '*.jpeg' \
+        -o -iname '*.webp' -o -iname '*.bmp' \) 2>/dev/null | sort -u
+}
+
+# Replace the `path =` line inside a named block, preserving the original
+# indentation and alignment. hyprlock.conf has several blocks, so a blind
+# s/^path/ would hit the wrong one.
+set_conf_path() {
+    local file="$1" block="$2" newpath="$3" tmp
+    [[ -f $file ]] || { info "skipping $file (not found)"; return 0; }
+    tmp=$(mktemp) || die "could not create temp file"
+
+    awk -v blk="$block" -v np="$newpath" '
+        $0 ~ "^[[:space:]]*" blk "[[:space:]]*\\{" { inblk = 1 }
+        inblk && /^[[:space:]]*\}/                 { inblk = 0 }
+        inblk && /^[[:space:]]*path[[:space:]]*=/ {
+            match($0, /^[[:space:]]*path[[:space:]]*=[[:space:]]*/)
+            printf "%s%s\n", substr($0, 1, RLENGTH), np
+            found = 1
+            next
+        }
+        { print }
+        END { exit(found ? 0 : 1) }
+    ' "$file" > "$tmp"
+
+    if [[ $? -ne 0 ]]; then
+        rm -f "$tmp"
+        info "no path= line in $block{} of $(basename "$file") — left unchanged"
+        return 0
+    fi
+    mv "$tmp" "$file"
+}
+
+apply() {
+    local img="$1" mon applied=0
+
+    [[ -f $img ]] || die "no such file: $img"
+    magick identify "$img" >/dev/null 2>&1 || die "not a readable image: $img"
+    img=$(realpath "$img")
+
+    # Live apply, per connected monitor. hyprpaper >=0.8 loads on demand, so
+    # there is no preload step (older guides say otherwise; that command is gone).
+    if command -v hyprctl >/dev/null && pgrep -x hyprpaper >/dev/null; then
+        while read -r mon; do
+            [[ -z $mon ]] && continue
+            if hyprctl hyprpaper wallpaper "$mon,$img" >/dev/null 2>&1; then
+                applied=1
+            else
+                info "live apply failed on $mon"
+            fi
+        done < <(hyprctl monitors | awk '/^Monitor/ {print $2}')
+        [[ $applied -eq 1 ]] && info "applied to display"
+    else
+        info "hyprpaper not running — config updated, will apply on next start"
+    fi
+
+    set_conf_path "$HYPRPAPER_CONF" wallpaper "$img"
+    [[ $UPDATE_LOCK -eq 1 ]] && set_conf_path "$HYPRLOCK_CONF" background "$img"
+
+    printf '\033[32m✓\033[0m %s\n' "$(basename "$img")"
+    [[ $UPDATE_LOCK -eq 1 ]] || info "lock screen left unchanged"
+}
+
+pick_rofi() {
+    local list entry
+    list=$(find_wallpapers)
+    [[ -z $list ]] && die "no wallpapers found in: ${WALLPAPER_DIRS[*]}"
+
+    # rofi renders \0icon\x1f<path> as a thumbnail, so this is a visual picker.
+    entry=$(while read -r f; do
+                printf '%s\0icon\x1f%s\n' "$(basename "${f%.*}")" "$f"
+            done <<< "$list" |
+            rofi -dmenu -i -p "Wallpaper" -show-icons \
+                 -theme-str 'element-icon { size: 5em; } listview { lines: 5; columns: 3; }')
+
+    [[ -z $entry ]] && { info "cancelled"; exit 0; }
+    grep -F "/$entry." <<< "$list" | head -1
+}
+
+main() {
+    local target=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help)    usage ;;
+            --no-lock)    UPDATE_LOCK=0; shift ;;
+            -l|--list)    find_wallpapers; exit 0 ;;
+            -c|--current)
+                if pgrep -x hyprpaper >/dev/null; then
+                    hyprctl hyprpaper listactive
+                else
+                    grep -A3 'wallpaper' "$HYPRPAPER_CONF" | grep 'path'
+                fi
+                exit 0 ;;
+            -r|--random)
+                target=$(find_wallpapers | shuf -n1)
+                [[ -z $target ]] && die "no wallpapers found"
+                shift ;;
+            -*)           die "unknown option: $1 (try --help)" ;;
+            *)            target="$1"; shift ;;
+        esac
+    done
+
+    [[ -z $target ]] && target=$(pick_rofi)
+    [[ -z $target ]] && exit 0
+    apply "$target"
+}
+
+main "$@"

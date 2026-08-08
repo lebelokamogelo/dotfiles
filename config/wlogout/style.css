@@ -1,0 +1,35 @@
+* {
+  background-image: none;
+  box-shadow: none;
+  font-family: "JetBrainsMono Nerd Font", sans-serif;
+}
+
+window {
+  background-color: rgba(17, 24, 38, 0.85);
+}
+
+button {
+  color: #dddddd;
+  font-size: 20px;
+  background-color: #182545;
+  border: 2px solid #182545;
+  border-radius: 14px;
+  margin: 10px;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+button:focus,
+button:active,
+button:hover {
+  background-color: #1e2f56;
+  border-color: #82dccc;
+  color: #82dccc;
+  outline-style: none;
+}
+
+#shutdown:focus,
+#shutdown:active,
+#shutdown:hover {
+  border-color: #ff5555;
+  color: #ff5555;
+}

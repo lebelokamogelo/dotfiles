@@ -1,0 +1,10 @@
+# machine-local state / secrets — never commit these
+config/fish/fish_variables
+config/**/*.log
+config/**/*cache*
+config/**/*state*
+
+# editor + OS noise
+*.swp
+*~
+.DS_Store
