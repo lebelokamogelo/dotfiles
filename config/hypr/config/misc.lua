@@ -9,6 +9,8 @@ hl.config({
         middle_click_paste = false,
         -- let dialogs that request focus have it
         focus_on_activate = true,
+        mouse_move_enables_dpms = true,
+        key_press_enables_dpms = true,
         enable_swallow = true,
         swallow_regex = "(kitty|ghostty|[Kk]onsole|Alacritty|gnome-terminal|xfce[0-9]?-terminal)",
         vrr = 3,
