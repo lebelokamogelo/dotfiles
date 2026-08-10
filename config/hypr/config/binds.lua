@@ -94,7 +94,7 @@ hl.bind(mainMod .. " + Space",      hl.dsp.exec_cmd(LAUNCHER))
 hl.bind(mainMod .. " + X",          hl.dsp.exec_cmd(NOTIF_PANEL))
 hl.bind(mainMod .. " + L",          hl.dsp.exec_cmd(LOCK))
 hl.bind(mainMod .. " + ALT + C",    hl.dsp.exec_cmd(SESSION))
-hl.bind(mainMod .. " + Z",          hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
+hl.bind(mainMod .. " + SHIFT + B",  hl.dsp.exec_cmd("killall -SIGUSR1 waybar"))
 
 ---------------------------
 ---- HARDWARE CONTROLS ----
