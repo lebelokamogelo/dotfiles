@@ -8,9 +8,7 @@ hl.workspace_rule({ workspace = "2", monitor = MONITOR1 })
 hl.workspace_rule({ workspace = "3", monitor = MONITOR1 })
 hl.workspace_rule({ workspace = "4", monitor = MONITOR1 })
 hl.workspace_rule({ workspace = "5", monitor = MONITOR1 })
-hl.workspace_rule({ workspace = "6", monitor = MONITOR1 })
-hl.workspace_rule({ workspace = "7", monitor = MONITOR1 })
-hl.workspace_rule({ workspace = "8", monitor = MONITOR1 })
-hl.workspace_rule({ workspace = "9", monitor = MONITOR1 })
--- When you add a second monitor, set MONITOR2 in variables.lua and move some of
--- the rules above onto it, e.g. monitor = MONITOR2, default = true.
+hl.workspace_rule({ workspace = "6", monitor = MONITOR2, default = true })
+hl.workspace_rule({ workspace = "7", monitor = MONITOR2 })
+hl.workspace_rule({ workspace = "8", monitor = MONITOR2 })
+hl.workspace_rule({ workspace = "9", monitor = MONITOR2 })
