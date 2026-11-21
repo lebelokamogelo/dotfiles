@@ -4,6 +4,7 @@ hl.config({
     input = {
         -- sensitivity = -0.25,
         accel_profile = "flat",
+        numlock_by_default = true,
         -- Scroll direction. false = "traditional" (fingers down -> view scrolls down),
         -- true = "natural" (content follows your fingers, phone/Mac style).
         -- Flip both of these together if the direction feels wrong.
@@ -20,5 +21,5 @@ hl.config({
     -- },
 })
 
-hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+-- hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 hl.gesture({ fingers = 4, direction = "horizontal", action = "workspace" })

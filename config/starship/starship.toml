@@ -1,0 +1,15 @@
+format = "$directory$git_branch$character"
+add_newline = false
+
+[directory]
+style = "bold #82dccc"
+truncation_length = 3
+read_only = ""
+
+[git_branch]
+format = "[$branch]($style) "
+style = "#798bb2"
+
+[character]
+success_symbol = "[❯](bold #01ccff)"
+error_symbol = "[❯](bold #ff5555)"

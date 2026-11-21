@@ -1,4 +1,16 @@
 hl.config({
+    general = {
+        layout = "master",
+        snap = {
+            enabled = true,
+            respect_gaps = true,
+        },
+    },
+    master = {
+        new_on_top = true,
+        new_status = "slave",
+        allow_small_split = true,
+    },
     dwindle = {
         preserve_split = true,
     },
@@ -6,6 +18,11 @@ hl.config({
         col = {
             splash = CACHYLGREEN,
         },
+        disable_hyprland_logo = true,
+        disable_splash_rendering = true,
+        force_default_wallpaper = 0,
+        allow_session_lock_restore = true,
+        anr_missed_pings = 5,
         middle_click_paste = false,
         -- let dialogs that request focus have it
         focus_on_activate = true,

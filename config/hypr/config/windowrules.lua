@@ -61,7 +61,6 @@ hl.window_rule({
     size     = { "monitor_w*0.75", "monitor_h*0.75" },
     min_size = { "max(monitor_w, monitor_h)*0.45", "min(monitor_w, monitor_h)*0.45" },
 })
-hl.window_rule({ match = { class = "^(dev\\.)?(noctalia\\.Noctalia(\\.Settings)?)$" }, float = true, size = { "monitor_w*0.70", "monitor_h*0.70" } })
 hl.window_rule({
     match = {
         class = "^(org\\.gnome\\.Nautilus)$",

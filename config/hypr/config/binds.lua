@@ -1,5 +1,5 @@
 local mainMod = "SUPER"
-local launchPrefix = "uwsm app -- " -- if you are not using UWSM, make this empty (e.g. "")
+local launchPrefix = "uwsm-app -- " -- if you are not using UWSM, make this empty (e.g. "")
 
 local LAUNCHER    = "rofi -show drun"
 local WINDOW_SW   = "rofi -show window"
@@ -128,6 +128,7 @@ local SATTY = table.concat({
     "--output-filename ~/Pictures/Screenshots/screenshot-%Y%m%d-%H%M%S.png",
     "--copy-command wl-copy",
     "--auto-copy",                                          -- keep clipboard in sync while annotating
+    "--disable-notifications",
     "--actions-on-enter save-to-clipboard,save-to-file,exit",
     -- Scoped to the save triggers on purpose: a bare --early-exit also fires on
     -- copy, which --auto-copy triggers on every annotation, closing the window.
