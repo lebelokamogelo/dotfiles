@@ -10,6 +10,9 @@ hyprpolkitagent
 hyprcursor
 xdg-desktop-portal-hyprland
 uwsm
+xdg-desktop-portal-gtk
+qt6-wayland
+sddm
 
 # --- bar, launcher, notifications, logout ---
 waybar
@@ -24,24 +27,42 @@ fish
 # --- clipboard ---
 cliphist
 wl-clipboard
+grim
+slurp
+satty
+hyprpicker
 
 # --- theming ---
 papirus-icon-theme
 ttf-jetbrains-mono-nerd
 nwg-look
 qt6ct
+adwaita-fonts
+noto-fonts
+noto-fonts-emoji
+cachyos-wallpapers
 
 # --- media / hardware controls used by waybar modules ---
 playerctl
 brightnessctl
 pavucontrol
 network-manager-applet
+blueman
+pipewire
+pipewire-pulse
+wireplumber
+bluez
+bluez-utils
 
 # --- utilities (setbg + waybar scripts depend on these) ---
 imagemagick
 jq
 btop
 micro
+gnome-text-editor
+gnome-calculator
+brave-bin
 
 # --- file managers ---
 nautilus
+yazi

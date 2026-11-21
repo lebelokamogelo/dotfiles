@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Set the wallpaper for hyprpaper (desktop) and hyprlock (lock screen).
+# Set the wallpaper for hyprpaper (desktop), hyprlock (lock screen) and SDDM (login).
 
 set -uo pipefail
 
 HYPRPAPER_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprpaper.conf"
 HYPRLOCK_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
+SDDM_BG="/usr/share/sddm/themes/navy/background"
 
 WALLPAPER_DIRS=(
     "$HOME/.local/share/wallpapers"
@@ -25,7 +26,7 @@ setbg <image>            set that image
 setbg -r, --random       pick a random one
 setbg -l, --list         list wallpapers found
 setbg -c, --current      show current wallpaper
-setbg --no-lock <image>  desktop only, skip lock screen
+setbg --no-lock <image>  desktop only, skip lock and login screens
 EOF
     exit 0
 }
@@ -67,6 +68,18 @@ set_conf_path() {
     mv "$tmp" "$file"
 }
 
+set_sddm_bg() {
+    local img="$1"
+    if [[ ! -w $SDDM_BG ]]; then
+        info "login screen not updated ($SDDM_BG missing or not writable — run install.sh)"
+        return 0
+    fi
+    case "${img,,}" in
+        *.png|*.jpg|*.jpeg|*.bmp) cp "$img" "$SDDM_BG" ;;
+        *) magick "$img" "png:$SDDM_BG" ;;
+    esac || info "could not update login screen"
+}
+
 apply() {
     local img="$1" mon applied=0
 
@@ -91,6 +104,7 @@ apply() {
 
     set_conf_path "$HYPRPAPER_CONF" wallpaper "$img"
     [[ $UPDATE_LOCK -eq 1 ]] && set_conf_path "$HYPRLOCK_CONF" background "$img"
+    [[ $UPDATE_LOCK -eq 1 ]] && set_sddm_bg "$img"
 
     printf '\033[32m✓\033[0m %s\n' "$(basename "$img")"
     [[ $UPDATE_LOCK -eq 1 ]] || info "lock screen left unchanged"

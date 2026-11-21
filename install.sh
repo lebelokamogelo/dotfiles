@@ -98,16 +98,18 @@ for src in "$REPO"/local/bin/*; do
     c_ok "$(basename "$src")"
 done
 
-# Plain cp, not deploy(): ~/.local/share/applications and icons hold entries from
-# installed packages too, so the directories must be merged, never replaced.
-c_info "deploying launcher entries and icons to ~/.local/share"
-run mkdir -p "$HOME/.local/share/applications" \
-             "$HOME/.local/share/icons/hicolor/scalable/apps"
-run cp "$REPO"/local/share/applications/*.desktop \
-       "$HOME/.local/share/applications/"
-run cp "$REPO"/local/share/icons/hicolor/scalable/apps/*.svg \
-       "$HOME/.local/share/icons/hicolor/scalable/apps/"
-c_ok "launcher entries and icons"
+if [[ ! -d $HOME/.local/share/icons/Bibata-Modern-Ice ]]; then
+    c_info "installing Bibata-Modern-Ice cursor"
+    if [[ $DRY_RUN -eq 1 ]]; then
+        printf '   \033[90mwould download:\033[0m Bibata-Modern-Ice.tar.xz\n'
+    elif mkdir -p "$HOME/.local/share/icons" &&
+         curl -fsSL https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-Modern-Ice.tar.xz |
+         tar -xJ -C "$HOME/.local/share/icons"; then
+        c_ok "Bibata-Modern-Ice"
+    else
+        c_warn "cursor download failed — falling back to the default cursor"
+    fi
+fi
 
 # waybar's own helper scripts must stay executable
 [[ -d $HOME/.config/waybar/scripts ]] && run chmod +x "$HOME"/.config/waybar/scripts/*.sh 2>/dev/null
@@ -123,17 +125,38 @@ if [[ -d "$REPO/sddm" ]]; then
             printf '[Theme]\nCurrent=navy\n' |
                 sudo tee /etc/sddm.conf.d/10-theme.conf >/dev/null
         fi
+        bg=$(awk -F= '/^[[:space:]]*path[[:space:]]*=/ { gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit }' \
+                 "$HOME/.config/hypr/hyprlock.conf" 2>/dev/null)
+        [[ -f $bg ]] || bg=/usr/share/wallpapers/cachyos-wallpapers/Abstract.png
+        if [[ -f $bg ]]; then
+            run sudo install -o "$USER" -m 644 "$bg" /usr/share/sddm/themes/navy/background
+        else
+            c_warn "no wallpaper found for the login screen"
+        fi
         c_ok "sddm theme 'navy'"
+        for f in /etc/sddm.conf /etc/sddm.conf.d/*.conf; do
+            [[ -f $f && $f != */10-theme.conf ]] || continue
+            grep -q '^Current=' "$f" && c_warn "$f also sets the SDDM theme and may override navy"
+        done
     else
         c_warn "sddm theme skipped"
     fi
 fi
 
 # ---------------------------------------------------------------- services ---
+c_info "enabling system services (needs sudo)"
+for svc in sddm bluetooth; do
+    if run sudo systemctl enable "$svc.service" &>/dev/null; then
+        c_ok "$svc.service enabled"
+    else
+        c_warn "could not enable $svc.service"
+    fi
+done
+
 c_info "enabling user services"
 if [[ $DRY_RUN -eq 0 ]] && systemctl --user show-environment &>/dev/null; then
     systemctl --user daemon-reload
-    for svc in waybar hyprpaper; do
+    for svc in waybar hyprpaper swaync hypridle hyprpolkitagent; do
         if systemctl --user enable "$svc.service" &>/dev/null; then
             c_ok "$svc.service enabled"
         else
@@ -142,7 +165,7 @@ if [[ $DRY_RUN -eq 0 ]] && systemctl --user show-environment &>/dev/null; then
     done
 else
     run systemctl --user daemon-reload
-    run systemctl --user enable waybar.service hyprpaper.service
+    run systemctl --user enable waybar.service hyprpaper.service swaync.service hypridle.service hyprpolkitagent.service
 fi
 
 # Waybar draws network and bluetooth natively, so the tray applets are redundant.
