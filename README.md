@@ -36,6 +36,7 @@ preview, `--no-pkgs` to deploy configs without touching pacman.
 | `systemd/user/` | `~/.config/systemd/user/` | Restart drop-ins for waybar + hyprpaper |
 | `local/bin/setbg` | `~/.local/bin/setbg` | Wallpaper switcher |
 | `local/bin/project` | `~/.local/bin/project` | Second screen / projector menu |
+| `local/bin/settings` | `~/.local/bin/settings` | Settings menu (`SUPER+I`) |
 | `sddm/navy/` | `/usr/share/sddm/themes/` | Login screen theme (needs root) |
 | `packages.txt` | — | Package list installed by `install.sh` |
 

@@ -144,6 +144,7 @@ local SHOT_REGION = [[grim -g "$(slurp)" - | ]] .. CLIP .. SATTY
 local SHOT_FULL   = "grim - | " .. CLIP .. SATTY
 
 hl.bind(mainMod .. " + P",         hl.dsp.exec_cmd("project"))
+hl.bind(mainMod .. " + I",         hl.dsp.exec_cmd("settings"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind("Print",                   hl.dsp.exec_cmd(SHOT_REGION))
 hl.bind(mainMod .. " + Print",     hl.dsp.exec_cmd(SHOT_FULL))

@@ -111,6 +111,19 @@ if [[ ! -d $HOME/.local/share/icons/Bibata-Modern-Ice ]]; then
     fi
 fi
 
+c_info "deploying launcher entries to ~/.local/share/applications"
+run mkdir -p "$HOME/.local/share/applications"
+run cp "$REPO"/local/share/applications/*.desktop "$HOME/.local/share/applications/"
+c_ok "launcher entries"
+
+if command -v gsettings >/dev/null; then
+    run gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
+    run gsettings set org.gnome.desktop.interface icon-theme Papirus-Dark
+    run gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+    run gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Ice
+    c_ok "gtk theme, icons and cursor"
+fi
+
 # waybar's own helper scripts must stay executable
 [[ -d $HOME/.config/waybar/scripts ]] && run chmod +x "$HOME"/.config/waybar/scripts/*.sh 2>/dev/null
 

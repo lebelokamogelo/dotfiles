@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+launch() {
+    command -v uwsm-app >/dev/null && exec uwsm-app -- "$@"
+    exec "$@"
+}
+
+entries=(
+    "Wi-Fi|network-wireless"
+    "Network connections|preferences-system-network"
+    "Bluetooth|bluetooth"
+    "Sound|multimedia-volume-control"
+    "Displays|preferences-desktop-display"
+    "Appearance|preferences-desktop-theme"
+    "Qt appearance|qt"
+    "Wallpaper|preferences-desktop-wallpaper"
+    "Power mode|preferences-system-power-management"
+)
+
+choice=$(for e in "${entries[@]}"; do printf '%s\0icon\x1f%s\n' "${e%%|*}" "${e##*|}"; done |
+         rofi -dmenu -i -p Settings -show-icons -l ${#entries[@]})
+
+case "$choice" in
+    "Wi-Fi")               launch kitty -1 -e nmtui connect ;;
+    "Network connections") launch nm-connection-editor ;;
+    "Bluetooth")           launch blueman-manager ;;
+    "Sound")               launch pavucontrol ;;
+    "Displays")            exec project ;;
+    "Appearance")          launch nwg-look ;;
+    "Qt appearance")       launch qt6ct ;;
+    "Wallpaper")           exec setbg ;;
+    "Power mode")
+        current=$(powerprofilesctl get)
+        mode=$(powerprofilesctl list | grep -oE '^\*? *[a-z-]+:' | tr -d '* :' |
+               rofi -dmenu -i -p "Power ($current)" -l 3)
+        [[ -n $mode ]] && powerprofilesctl set "$mode" && notify-send -a Settings "Power mode: $mode" ;;
+esac

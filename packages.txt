@@ -34,6 +34,7 @@ hyprpicker
 
 # --- theming ---
 papirus-icon-theme
+adw-gtk-theme
 ttf-jetbrains-mono-nerd
 nwg-look
 qt6ct
@@ -48,6 +49,8 @@ brightnessctl
 pavucontrol
 network-manager-applet
 blueman
+networkmanager
+power-profiles-daemon
 pipewire
 pipewire-pulse
 wireplumber

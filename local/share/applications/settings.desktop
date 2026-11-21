@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Settings
+Comment=Wi-Fi, Bluetooth, sound, displays, appearance, wallpaper and power
+Exec=settings
+Icon=preferences-system
+Terminal=false
+Categories=Settings;
+Keywords=wifi;network;bluetooth;sound;audio;display;monitor;theme;appearance;wallpaper;power;
