@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+mons=$(hyprctl monitors all -j) || exit 1
+internal=$(jq -r '[.[] | select(.name | startswith("eDP"))][0].name // .[0].name' <<< "$mons")
+mapfile -t externals < <(jq -r --arg i "$internal" '.[] | select(.name != $i) | .name' <<< "$mons")
+
+if [[ ${#externals[@]} -eq 0 ]]; then
+    notify-send -a Display "No second screen connected"
+    exit 0
+fi
+
+mode="${1:-}"
+if [[ -z $mode ]]; then
+    case "$(printf 'Extend\nDuplicate\nPC screen only\n' | rofi -dmenu -i -l 3 -p Project)" in
+        Extend)           mode=extend ;;
+        Duplicate)        mode=duplicate ;;
+        "PC screen only") mode=pc ;;
+        *)                exit 0 ;;
+    esac
+fi
+
+case "$mode" in
+    extend)
+        hyprctl reload >/dev/null ;;
+    duplicate)
+        for m in "${externals[@]}"; do
+            hyprctl eval "hl.monitor({ output = \"$m\", mode = \"preferred\", position = \"auto\", scale = \"auto\", disabled = false, mirror = \"$internal\" })" >/dev/null
+        done ;;
+    pc)
+        for m in "${externals[@]}"; do
+            hyprctl eval "hl.monitor({ output = \"$m\", disabled = true })" >/dev/null
+        done ;;
+    *)
+        echo "usage: project [extend|duplicate|pc]" >&2
+        exit 1 ;;
+esac

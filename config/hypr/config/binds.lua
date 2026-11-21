@@ -23,7 +23,7 @@ hl.bind(mainMod .. " + Q",           hl.dsp.window.close())
 hl.bind(mainMod .. " + ALT + Space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + D",           hl.dsp.window.fullscreen({ mode = 1 }))
 hl.bind(mainMod .. " + F",           hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + J",           hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + J",           hl.dsp.layout("orientationcycle left top"))
 
 -- Change focus
 hl.bind(mainMod .. " + Left",  hl.dsp.focus({ direction = "left" }))
@@ -143,7 +143,8 @@ local CLIP = "tee >(wl-copy) | "
 local SHOT_REGION = [[grim -g "$(slurp)" - | ]] .. CLIP .. SATTY
 local SHOT_FULL   = "grim - | " .. CLIP .. SATTY
 
-hl.bind(mainMod .. " + P",         hl.dsp.exec_cmd("hyprpicker -a -n"))
+hl.bind(mainMod .. " + P",         hl.dsp.exec_cmd("project"))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a -n"))
 hl.bind("Print",                   hl.dsp.exec_cmd(SHOT_REGION))
 hl.bind(mainMod .. " + Print",     hl.dsp.exec_cmd(SHOT_FULL))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(SHOT_REGION))
