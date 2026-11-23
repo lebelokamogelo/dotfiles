@@ -30,7 +30,7 @@ window#waybar.hidden {
 
 #workspaces,
 #clock,
-#mpris,
+#custom-media,
 #stats,
 #controls,
 #tray,
@@ -112,14 +112,15 @@ window#waybar.empty #window {
   padding: 0 16px;
 }
 
-#mpris {
+#custom-media {
   color: @accent2;
   padding: 0 12px;
   font-weight: 400;
 }
 
-#mpris.paused {
+#custom-media.paused {
   color: @muted;
+  font-style: italic;
 }
 
 #tray {
