@@ -1,6 +1,6 @@
 hl.config({
     general = {
-        layout = "master",
+        layout = "dwindle",
         snap = {
             enabled = true,
             respect_gaps = true,
